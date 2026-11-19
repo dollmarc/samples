@@ -1,0 +1,688 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>marc doll design samples</title>
+<meta name="description" content="design samples from marc doll">
+<meta name="theme-color" content="#2d2d2d">
+<link rel="icon" href="data:,">
+<style>
+:root {
+  --charcoal: #2d2d2d;   /* page */
+  --well: #1e1e1e;       /* viewer backdrop */
+  --tile: #383838;       /* thumbnail placeholder */
+  --line: #4a4a4a;
+  --ink: #ececea;
+  --quiet: #989896;
+  --row: 190px;          /* thumbnail row height */
+  --gap: 10px;
+  --margin: clamp(16px, 4vw, 56px);
+}
+@media (max-width: 600px) {
+  :root { --row: 130px; --gap: 8px; }
+}
+
+* { box-sizing: border-box; }
+html {
+  color-scheme: dark;
+  background: var(--charcoal);
+  -webkit-text-size-adjust: 100%;
+}
+html.viewing { overflow: hidden; }
+body {
+  margin: 0;
+  background: var(--charcoal);
+  color: var(--ink);
+  font: 400 15px/1.4 "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* masthead */
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px 32px;
+  padding: clamp(28px, 6vw, 72px) var(--margin) clamp(28px, 5vw, 56px);
+}
+.masthead h1,
+.masthead .sub {
+  margin: 0;
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  text-transform: lowercase;
+}
+.masthead .sub { color: var(--quiet); }
+
+/* shown only when the page is opened from your own computer */
+.local { max-width: 46ch; font-size: 14px; color: var(--quiet); }
+.local button {
+  font: inherit;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.local button:hover:not(:disabled) { border-color: var(--ink); }
+.local button:disabled { color: var(--quiet); cursor: default; }
+.local p { margin: 10px 0 0; }
+.local p:empty { display: none; }
+
+/* gallery */
+main { padding: 0 var(--margin) 80px; }
+.group + .group { margin-top: 44px; }
+.group h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--quiet);
+  text-transform: lowercase;
+}
+.grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--gap);
+}
+/* soaks up the spare width in the last row so its thumbnails are not stretched */
+.grid::after { content: ""; flex: 1000000 0 0; }
+.thumb {
+  display: block;
+  flex: var(--r) 1 calc(var(--r) * var(--row));
+  min-width: 0;
+  max-width: calc(var(--r) * var(--row) * 1.6);   /* a lone thumbnail in a row never balloons */
+  aspect-ratio: var(--r);
+  background: var(--tile);
+  overflow: hidden;
+  cursor: zoom-in;
+  outline: 1px solid transparent;
+  outline-offset: 2px;
+}
+.thumb:hover { outline-color: var(--quiet); }
+.thumb:focus-visible { outline: 2px solid var(--ink); }
+.thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.empty { max-width: 52ch; margin: 0; color: var(--quiet); }
+
+/* viewer */
+.viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  background: var(--well);
+  animation: viewer-in 0.12s ease-out;
+}
+.viewer[hidden] { display: none; }
+@keyframes viewer-in { from { opacity: 0; } }
+
+.bar {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  height: 48px;
+  padding: 0 4px 0 16px;
+  font-size: 14px;
+  color: var(--quiet);
+  border-bottom: 1px solid #2e2e2e;
+}
+.bar .name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--ink);
+}
+.bar .count { min-width: 7ch; text-align: center; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar button {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  height: 44px;
+  padding: 0 8px;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  color: var(--quiet);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.bar button:hover:not(:disabled) { color: var(--ink); }
+.bar button:disabled { cursor: default; }
+.bar button:focus-visible { outline-offset: -5px; }
+.bar .zoom { min-width: 58px; margin-left: 4px; }
+.bar svg { display: block; width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+.stage {
+  display: flex;
+  min-width: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  outline: none;
+}
+.stage img {
+  flex: none;
+  display: block;
+  margin: auto;            /* centres when smaller than the stage, scrolls when larger */
+  max-width: none;
+  background-size: 100% 100%;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+.stage.zoom-in img { cursor: zoom-in; }
+.stage.zoom-out img { cursor: zoom-out; }
+.stage.panning img { cursor: grabbing; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead" id="masthead">
+  <div>
+    <h1>marc doll design</h1>
+    <p class="sub">samples</p>
+  </div>
+  <div class="local" id="local" hidden>
+    <button type="button" id="update">update samples</button>
+    <p id="status" role="status"></p>
+  </div>
+</header>
+
+<main id="gallery"></main>
+
+<div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-label="sample viewer" hidden>
+  <div class="bar">
+    <span class="name" id="name"></span>
+    <button type="button" id="prev" aria-label="previous sample" title="previous (left arrow)">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2.5 4.5 8l5.5 5.5"/></svg>
+    </button>
+    <span class="count" id="count"></span>
+    <button type="button" id="next" aria-label="next sample" title="next (right arrow)">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 2.5 11.5 8 6 13.5"/></svg>
+    </button>
+    <button type="button" class="zoom" id="zoom"></button>
+    <button type="button" id="close" aria-label="close" title="close (esc)">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m3 3 10 10M13 3 3 13"/></svg>
+    </button>
+  </div>
+  <div class="stage" id="stage" tabindex="0"></div>
+</div>
+
+<!-- the list of samples. written by "update samples"; safe to be missing. -->
+<script src="samples.js"></script>
+<script>
+(() => {
+  'use strict';
+
+  const data = (window.SAMPLES && Array.isArray(window.SAMPLES.items)) ? window.SAMPLES : { items: [] };
+  let items = [];
+
+  const $ = id => document.getElementById(id);
+  const gallery = $('gallery'), masthead = $('masthead');
+  const viewer = $('viewer'), stage = $('stage');
+  const nameEl = $('name'), countEl = $('count');
+  const prevBtn = $('prev'), nextBtn = $('next'), zoomBtn = $('zoom'), closeBtn = $('close');
+
+  const isLocal = location.protocol === 'file:' ||
+    /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+
+  // thumbnails keep each sample's proportions, within these limits
+  const RATIO_MIN = 0.45, RATIO_MAX = 3;
+  const clampRatio = r => Math.min(RATIO_MAX, Math.max(RATIO_MIN, r));
+
+  const enc = path => path.split('/').map(encodeURIComponent).join('/');
+  const fullUrl = it => 'images/' + enc(it.src);
+  const thumbUrl = it => 'thumbs/' + enc(it.t);
+  const pretty = s => s.replace(/_+/g, ' ').replace(/(\D)-/g, '$1 ').replace(/-(\D)/g, ' $1')
+    .replace(/\s+/g, ' ').trim().toLowerCase();
+  const nameOf = src => pretty(src.split('/').pop().replace(/\.[^.]+$/, ''));
+  const groupOf = src => { const i = src.lastIndexOf('/'); return i < 0 ? '' : src.slice(0, i); };
+
+  /* ---------- gallery ---------- */
+
+  function render() {
+    items = data.items.slice();
+    gallery.textContent = '';
+    if (!items.length) {
+      const p = document.createElement('p');
+      p.className = 'empty';
+      p.textContent = isLocal
+        ? 'no samples yet. put your images in a folder named images, next to this file, then choose update samples.'
+        : 'no samples yet.';
+      gallery.append(p);
+      return;
+    }
+    let current = null, grid = null;
+    items.forEach((it, i) => {
+      const group = groupOf(it.src);
+      if (group !== current) {
+        current = group;
+        const section = document.createElement('section');
+        section.className = 'group';
+        if (group) {
+          const h = document.createElement('h2');
+          h.textContent = group.split('/').map(pretty).join(' / ');
+          section.append(h);
+        }
+        grid = document.createElement('div');
+        grid.className = 'grid';
+        section.append(grid);
+        gallery.append(section);
+      }
+      const a = document.createElement('a');
+      a.className = 'thumb';
+      a.href = fullUrl(it);
+      a.dataset.i = i;
+      a.style.setProperty('--r', clampRatio(it.w / it.h).toFixed(4));
+      const img = new Image();
+      img.loading = 'lazy';
+      img.decoding = 'async';
+      img.alt = nameOf(it.src);
+      if (it.tw && it.th) { img.width = it.tw; img.height = it.th; }
+      img.src = it.t ? thumbUrl(it) : fullUrl(it);
+      a.append(img);
+      grid.append(a);
+    });
+  }
+
+  gallery.addEventListener('click', e => {
+    const a = e.target.closest('a.thumb');
+    if (!a || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    open(+a.dataset.i);
+  });
+
+  /* ---------- viewer ---------- */
+
+  // phones and tablets open large samples fitted to the screen; everything else opens at 100%
+  let mode = matchMedia('(hover: none) and (pointer: coarse)').matches ? 'fit' : 'actual';
+  let cur = -1, last = -1, pushed = false;
+
+  const picture = () => stage.firstElementChild;
+
+  function reveal(i) {
+    viewer.hidden = false;
+    document.documentElement.classList.add('viewing');
+    masthead.inert = true;
+    gallery.inert = true;
+    show(i);
+    stage.focus({ preventScroll: true });
+  }
+
+  function open(i) {
+    reveal(i);
+    setHash(true);
+  }
+
+  function hide() {
+    if (viewer.hidden) return;
+    viewer.hidden = true;
+    document.documentElement.classList.remove('viewing');
+    masthead.inert = false;
+    gallery.inert = false;
+    stage.textContent = '';
+    pushed = false;
+    cur = -1;
+    const a = gallery.querySelector('a.thumb[data-i="' + last + '"]');
+    if (a) a.focus();          // also scrolls the gallery to the sample you were on
+  }
+
+  function close() {
+    const wasPushed = pushed;
+    hide();
+    try {
+      if (wasPushed) history.back();
+      else history.replaceState(null, '', location.pathname + location.search);
+    } catch (e) { /* history is not available everywhere; the viewer still closes */ }
+  }
+
+  function show(i) {
+    const n = items.length;
+    cur = last = ((i % n) + n) % n;
+    const it = items[cur];
+
+    const img = new Image();
+    img.alt = nameOf(it.src);
+    img.draggable = false;
+    img.decoding = 'async';
+    // the thumbnail stands in until the full image arrives
+    if (it.t && Math.abs(it.tw / it.th - it.w / it.h) < 0.02) {
+      img.style.backgroundImage = 'url("' + thumbUrl(it) + '")';
+    }
+    img.src = fullUrl(it);
+    stage.replaceChildren(img);
+
+    nameEl.textContent = (groupOf(it.src) ? groupOf(it.src).split('/').map(pretty).join(' / ') + ' / ' : '') + nameOf(it.src);
+    countEl.textContent = (cur + 1) + ' / ' + n;
+    prevBtn.hidden = nextBtn.hidden = n < 2;
+
+    layout();
+    stage.scrollTo(0, 0);
+    [cur + 1, cur - 1].forEach(j => { const o = items[((j % n) + n) % n]; if (o) new Image().src = fullUrl(o); });
+  }
+
+  function go(step) {
+    if (cur < 0 || items.length < 2) return;
+    show(cur + step);
+    setHash(false);
+  }
+
+  // sizes the image for the current mode: 100% (one image pixel per screen point) or fitted
+  function layout() {
+    const it = items[cur], img = picture();
+    if (!it || !img) return;
+    const sw = stage.offsetWidth, sh = stage.offsetHeight;
+    const pad = sw < 600 ? 0 : 24;
+    const fit = Math.min(1, (sw - pad * 2) / it.w, (sh - pad * 2) / it.h);
+    const fitsAlready = it.w <= sw && it.h <= sh;
+    const scale = (mode === 'fit' && !fitsAlready) ? fit : 1;
+    img.style.width = Math.max(1, Math.round(it.w * scale)) + 'px';
+    img.style.height = Math.max(1, Math.round(it.h * scale)) + 'px';
+    zoomBtn.textContent = Math.round(scale * 100) + '%';
+    zoomBtn.disabled = fitsAlready;
+    const label = fitsAlready ? 'shown at 100%' : (scale === 1 ? 'fit to window' : 'show at 100%');
+    zoomBtn.title = label;
+    zoomBtn.setAttribute('aria-label', zoomBtn.textContent + ', ' + label);
+    stage.classList.toggle('zoom-in', !fitsAlready && scale < 1);
+    stage.classList.toggle('zoom-out', !fitsAlready && scale === 1);
+  }
+
+  // switches between fitted and 100%, keeping the clicked point under the pointer
+  function toggleZoom(px, py) {
+    const it = items[cur], img = picture();
+    if (!it || !img || zoomBtn.disabled) return;
+    const sr = stage.getBoundingClientRect();
+    let fx = 0.5, fy = 0, tx = sr.width / 2, ty = 0;
+    if (px != null) {
+      const r = img.getBoundingClientRect();
+      fx = (px - r.left) / r.width; fy = (py - r.top) / r.height;
+      tx = px - sr.left; ty = py - sr.top;
+    }
+    mode = mode === 'fit' ? 'actual' : 'fit';
+    layout();
+    if (mode === 'actual') {
+      stage.scrollLeft = fx * it.w - tx;
+      stage.scrollTop = fy * it.h - ty;
+    }
+  }
+
+  prevBtn.addEventListener('click', () => go(-1));
+  nextBtn.addEventListener('click', () => go(1));
+  closeBtn.addEventListener('click', close);
+  zoomBtn.addEventListener('click', () => toggleZoom());
+  window.addEventListener('resize', layout);
+
+  document.addEventListener('keydown', e => {
+    if (viewer.hidden || e.altKey || e.ctrlKey || e.metaKey) return;
+    if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+    else if (e.key === 'Escape') { e.preventDefault(); close(); }
+  });
+
+  // click: the backdrop closes, the image switches between fitted and 100%
+  let suppressClick = false;
+  stage.addEventListener('click', e => {
+    if (suppressClick) { suppressClick = false; return; }
+    if (e.target === stage) close();
+    else toggleZoom(e.clientX, e.clientY);
+  });
+
+  // mouse: drag a large image to move around it
+  let drag = null;
+  stage.addEventListener('pointerdown', e => {
+    if (e.pointerType !== 'mouse' || e.button !== 0 || e.target === stage) return;
+    drag = { x: e.clientX, y: e.clientY, left: stage.scrollLeft, top: stage.scrollTop, moved: false };
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if (!drag.moved && Math.hypot(dx, dy) < 5) return;
+    drag.moved = true;
+    stage.classList.add('panning');
+    stage.scrollLeft = drag.left - dx;
+    stage.scrollTop = drag.top - dy;
+  });
+  const endDrag = () => {
+    if (drag && drag.moved) { suppressClick = true; setTimeout(() => { suppressClick = false; }, 0); }
+    drag = null;
+    stage.classList.remove('panning');
+  };
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('pointercancel', endDrag);
+
+  // touch: swipe sideways for the next or previous sample.
+  // on an image wider than the screen, the swipe moves around the image until it reaches an edge.
+  let touch = null;
+  const pinched = () => window.visualViewport && window.visualViewport.scale > 1.01;
+  stage.addEventListener('touchstart', e => {
+    if (e.touches.length !== 1 || pinched()) { touch = null; return; }
+    const t = e.touches[0];
+    touch = {
+      x: t.clientX, y: t.clientY, dx: 0, axis: null,
+      atLeft: stage.scrollLeft <= 1,
+      atRight: stage.scrollLeft + stage.clientWidth >= stage.scrollWidth - 1
+    };
+  }, { passive: true });
+  stage.addEventListener('touchmove', e => {
+    if (!touch) return;
+    const img = picture();
+    if (e.touches.length !== 1) { touch = null; if (img) img.style.transform = ''; return; }
+    const t = e.touches[0];
+    const dx = t.clientX - touch.x, dy = t.clientY - touch.y;
+    if (!touch.axis) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      touch.axis = Math.abs(dx) > Math.abs(dy) * 1.2 ? 'x' : 'y';
+    }
+    if (touch.axis !== 'x') return;
+    if ((dx > 0 && !touch.atLeft) || (dx < 0 && !touch.atRight)) { touch.dx = 0; return; }
+    touch.dx = dx;
+    if (img) { img.style.transition = 'none'; img.style.transform = 'translateX(' + dx + 'px)'; }
+  }, { passive: true });
+  const endTouch = () => {
+    if (!touch) return;
+    const dx = touch.dx;
+    touch = null;
+    const img = picture();
+    if (Math.abs(dx) > Math.min(80, stage.clientWidth * 0.2) && items.length > 1) { go(dx < 0 ? 1 : -1); return; }
+    if (img) { img.style.transition = 'transform 0.15s ease-out'; img.style.transform = ''; }
+  };
+  stage.addEventListener('touchend', endTouch);
+  stage.addEventListener('touchcancel', endTouch);
+
+  // each sample has its own address, so the back button closes the viewer and a link opens one sample
+  function setHash(push) {
+    const url = '#' + enc(items[cur].src);
+    try {
+      if (push) { history.pushState(null, '', url); pushed = true; }
+      else history.replaceState(null, '', url);
+    } catch (e) { /* fine without it */ }
+  }
+  function indexFromHash() {
+    let src = '';
+    try { src = decodeURIComponent(location.hash.slice(1)); } catch (e) { return -1; }
+    return src ? items.findIndex(it => it.src === src) : -1;
+  }
+  window.addEventListener('popstate', () => {
+    const i = indexFromHash();
+    if (i < 0) hide();
+    else if (viewer.hidden) reveal(i);
+    else show(i);
+  });
+
+  /* ---------- update samples (only offered on your own computer) ---------- */
+
+  const THUMB_HEIGHT = 480;
+  const IMAGE = /\.(png|jpe?g|webp|gif|avif)$/i;
+  const statusEl = $('status'), updateBtn = $('update');
+  const say = text => { statusEl.textContent = text; };
+
+  async function listEntries(dir) {
+    const out = [];
+    for await (const [name, handle] of dir.entries()) out.push([name, handle]);
+    return out;
+  }
+
+  async function findImages(dir, prefix, out) {
+    for (const [name, handle] of await listEntries(dir)) {
+      if (name.startsWith('.')) continue;
+      if (handle.kind === 'directory') await findImages(handle, prefix + name + '/', out);
+      else if (IMAGE.test(name)) out.push({ path: prefix + name, dir: prefix.slice(0, -1), name, handle });
+    }
+    return out;
+  }
+
+  async function locate(root, path, create) {
+    const parts = path.split('/'), name = parts.pop();
+    let dir = root;
+    for (const part of parts) dir = await dir.getDirectoryHandle(part, { create });
+    return [dir, name];
+  }
+  async function fileExists(root, path) {
+    try { const [dir, name] = await locate(root, path, false); await dir.getFileHandle(name); return true; }
+    catch (e) { return false; }
+  }
+  async function writeFile(root, path, blob) {
+    const [dir, name] = await locate(root, path, true);
+    const handle = await dir.getFileHandle(name, { create: true });
+    const stream = await handle.createWritable();
+    await stream.write(blob);
+    await stream.close();
+  }
+
+  // removes thumbnails whose sample is gone; only ever touches .webp files inside thumbs
+  async function prune(dir, prefix, keep) {
+    let removed = 0, left = 0;
+    for (const [name, handle] of await listEntries(dir)) {
+      if (handle.kind === 'directory') {
+        const sub = await prune(handle, prefix + name + '/', keep);
+        removed += sub.removed;
+        if (sub.left === 0) { try { await dir.removeEntry(name); } catch (e) { left++; } }
+        else left++;
+      } else if (/\.webp$/i.test(name) && !keep.has(prefix + name)) {
+        await dir.removeEntry(name);
+        removed++;
+      } else left++;
+    }
+    return { removed, left };
+  }
+
+  async function makeThumb(file) {
+    const bmp = await createImageBitmap(file);
+    const w = bmp.width, h = bmp.height, r = w / h, rc = clampRatio(r);
+    let sx = 0, sw = w, sh = h;
+    if (r < rc) sh = Math.round(w / rc);                                   // very tall: keep the top
+    else if (r > rc) { sw = Math.round(h * rc); sx = Math.round((w - sw) / 2); }  // very wide: keep the middle
+    const th = Math.min(THUMB_HEIGHT, sh), tw = Math.max(1, Math.round(th * sw / sh));
+    const canvas = document.createElement('canvas');
+    canvas.width = tw; canvas.height = th;
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingQuality = 'high';
+    let small = null;
+    try { small = await createImageBitmap(bmp, sx, 0, sw, sh, { resizeWidth: tw, resizeHeight: th, resizeQuality: 'high' }); }
+    catch (e) { small = null; }
+    if (small) { ctx.drawImage(small, 0, 0); small.close(); }
+    else ctx.drawImage(bmp, sx, 0, sw, sh, 0, 0, tw, th);
+    bmp.close();
+    const blob = await new Promise((resolve, reject) =>
+      canvas.toBlob(b => b ? resolve(b) : reject(new Error('could not save thumbnail')), 'image/webp', 0.82));
+    return { w, h, tw, th, blob };
+  }
+
+  async function updateSamples() {
+    if (!window.showDirectoryPicker) {
+      say('updating samples needs chrome or edge on a computer.');
+      return;
+    }
+    let root;
+    try { root = await window.showDirectoryPicker({ id: 'marc-doll-samples', mode: 'readwrite' }); }
+    catch (e) { return; }    // picker closed
+
+    let samplesDir;
+    try { samplesDir = await root.getDirectoryHandle('images'); }
+    catch (e) {
+      say('that folder has no images folder in it. choose the folder that holds this page and your images folder.');
+      return;
+    }
+
+    updateBtn.disabled = true;
+    try {
+      say('looking through samples');
+      const files = await findImages(samplesDir, '', []);
+      const order = new Intl.Collator('en', { numeric: true, sensitivity: 'base' });
+      files.sort((a, b) => order.compare(a.dir, b.dir) || order.compare(a.name, b.name));
+
+      const before = new Map(data.items.map(it => [it.src, it]));
+      const thumbs = await root.getDirectoryHandle('thumbs', { create: true });
+      const out = [], unreadable = [];
+      let made = 0;
+
+      for (let n = 0; n < files.length; n++) {
+        const f = files[n];
+        say('reading ' + (n + 1) + ' of ' + files.length);
+        const file = await f.handle.getFile();
+        const key = file.size.toString(36) + '.' + Math.round(file.lastModified / 1000).toString(36);
+        const t = f.path + '.webp';
+        const old = before.get(f.path);
+        if (old && old.k === key && old.t === t && await fileExists(thumbs, t)) { out.push(old); continue; }
+        try {
+          const made1 = await makeThumb(file);
+          await writeFile(thumbs, t, made1.blob);
+          out.push({ src: f.path, w: made1.w, h: made1.h, t, tw: made1.tw, th: made1.th, k: key });
+          made++;
+        } catch (e) { unreadable.push(f.path); }
+      }
+
+      const gone = data.items.filter(it => !out.some(o => o.src === it.src)).length;
+      await prune(thumbs, '', new Set(out.map(o => o.t)));
+
+      const js = '/* the list of samples. written by "update samples" in index.html; no need to edit by hand. */\n' +
+        'window.SAMPLES = ' + JSON.stringify({ items: out }, null, 1) + ';\n';
+      await writeFile(root, 'samples.js', new Blob([js], { type: 'text/javascript' }));
+
+      data.items = out;
+      render();
+
+      let text = out.length + (out.length === 1 ? ' sample' : ' samples') + '. ' + made + ' new or changed, ' + gone + ' removed.';
+      if (unreadable.length) text += ' could not read: ' + unreadable.join(', ') + '.';
+      text += ' to publish, upload samples.js and the images and thumbs folders to github.';
+      say(text);
+    } catch (e) {
+      say('update stopped: ' + (e && e.message ? e.message : e));
+    } finally {
+      updateBtn.disabled = false;
+    }
+  }
+
+  if (isLocal) {
+    $('local').hidden = false;
+    updateBtn.addEventListener('click', updateSamples);
+  }
+
+  /* ---------- start ---------- */
+
+  render();
+  const first = indexFromHash();
+  if (first >= 0) reveal(first);
+})();
+</script>
+</body>
+</html>
